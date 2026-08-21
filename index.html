@@ -372,9 +372,97 @@
     z-index:5;
     animation:burstPop 1.1s ease-out forwards;
   }
+
+  /* PIN gate */
+  .wrap, .music-btn{ visibility:hidden; }
+  body.unlocked .wrap, body.unlocked .music-btn{ visibility:visible; }
+
+  .pin-gate{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+    text-align:center;
+    background:linear-gradient(160deg,#ffe1ef 0%, #ffd6e8 25%, #e6d9ff 55%, #d9f2ff 100%);
+    transition:opacity .4s ease, visibility .4s ease;
+  }
+  .pin-gate.hidden{
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+  }
+  .pin-gate.shake{
+    animation:pinShake .4s;
+  }
+  @keyframes pinShake{
+    10%,90%{transform:translateX(-4px);}
+    20%,80%{transform:translateX(6px);}
+    30%,50%,70%{transform:translateX(-8px);}
+    40%,60%{transform:translateX(8px);}
+  }
+  .pin-lock-icon{
+    font-size:3rem;
+    margin-bottom:6px;
+    animation:pop 2.4s ease-in-out infinite;
+  }
+  .pin-title{
+    font-size:1.4rem;
+    font-weight:800;
+    color:var(--pink-deep);
+    margin:4px 0 2px;
+  }
+  .pin-sub{
+    font-size:0.95rem;
+    color:var(--purple);
+    font-weight:600;
+    margin:0 0 20px;
+  }
+  .pin-inputs{
+    display:flex;
+    gap:10px;
+    margin-bottom:12px;
+  }
+  .pin-box{
+    width:48px;height:58px;
+    text-align:center;
+    font-size:1.6rem;
+    font-weight:800;
+    color:#5a3350;
+    border-radius:14px;
+    border:2px solid #ffb8d6;
+    background:#fffdfb;
+    box-shadow:0 6px 14px rgba(150,80,130,0.15);
+  }
+  .pin-box:focus{
+    outline:none;
+    border-color:var(--pink-deep);
+  }
+  .pin-error{
+    color:#ff3d8a;
+    font-weight:700;
+    font-size:0.85rem;
+    min-height:1.3em;
+  }
 </style>
 </head>
 <body>
+
+<div class="pin-gate" id="pinGate">
+  <div class="pin-lock-icon">🔒</div>
+  <h2 class="pin-title">Kartu Ulang Tahun Aisyah</h2>
+  <p class="pin-sub">Masukkan PIN untuk membuka 🎂</p>
+  <div class="pin-inputs" id="pinInputs">
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
+  </div>
+  <div class="pin-error" id="pinError"></div>
+</div>
 
 <button class="music-btn" id="musicBtn" title="Putar musik">🎵</button>
 
@@ -558,6 +646,45 @@
   musicBtn.addEventListener('click', ()=>{
     if(!playing) startMusic(); else stopMusic();
   });
+
+  // ---- PIN gate ----
+  const CORRECT_PIN = '2008';
+  const pinGate = document.getElementById('pinGate');
+  const pinError = document.getElementById('pinError');
+  const pinBoxes = Array.from(document.querySelectorAll('.pin-box'));
+
+  function checkPin(){
+    const entered = pinBoxes.map(b => b.value).join('');
+    if(entered === CORRECT_PIN){
+      document.body.classList.add('unlocked');
+      pinGate.classList.add('hidden');
+    } else {
+      pinError.textContent = 'PIN salah, coba lagi ya 🙈';
+      pinGate.classList.add('shake');
+      setTimeout(()=> pinGate.classList.remove('shake'), 400);
+      pinBoxes.forEach(b => b.value = '');
+      pinBoxes[0].focus();
+    }
+  }
+
+  pinBoxes.forEach((box,i)=>{
+    box.addEventListener('input', ()=>{
+      box.value = box.value.replace(/[^0-9]/g,'').slice(0,1);
+      if(box.value && i < pinBoxes.length - 1){
+        pinBoxes[i+1].focus();
+      }
+      if(pinBoxes.every(b => b.value.length === 1)){
+        checkPin();
+      }
+    });
+    box.addEventListener('keydown', (e)=>{
+      if(e.key === 'Backspace' && !box.value && i > 0){
+        pinBoxes[i-1].focus();
+      }
+    });
+  });
+
+  if(pinBoxes[0]) pinBoxes[0].focus();
 </script>
 </body>
 </html>

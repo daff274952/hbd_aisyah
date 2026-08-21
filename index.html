@@ -532,94 +532,24 @@
     }
   });
 
-  // ---- Original heartfelt background melody (Web Audio API, no copyrighted file) ----
-  const NOTE_FREQ = {
-    C2:65.41,D2:73.42,E2:82.41,F2:87.31,G2:98.00,A2:110.00,B2:123.47,
-    C3:130.81,D3:146.83,E3:164.81,F3:174.61,G3:196.00,A3:220.00,B3:246.94,
-    C4:261.63,D4:293.66,E4:329.63,F4:349.23,G4:392.00,A4:440.00,B4:493.88,
-    C5:523.25
-  };
-  const beatSec = 0.62;
-  const melody = [
-    ['E4',0.5],['G4',0.5],['C5',0.5],['B4',0.5],
-    ['A4',0.5],['G4',0.5],['E4',0.5],['G4',0.5],
-    ['F4',0.5],['A4',0.5],['C5',0.5],['B4',0.5],
-    ['G4',0.5],['F4',0.5],['E4',1],
-    ['D4',0.5],['F4',0.5],['A4',0.5],['G4',0.5],
-    ['E4',0.5],['D4',0.5],['C4',1]
-  ];
-  const chordPad = [
-    { chord:['C3','E3','G3'], start:0,            dur:4*beatSec },
-    { chord:['A2','C3','E3'], start:4*beatSec,     dur:4*beatSec },
-    { chord:['F2','A2','C3'], start:8*beatSec,     dur:4*beatSec }
-  ];
-
-  let audioCtx = null;
-  let masterGain = null;
-  let playing = false;
-  let activeNodes = [];
-  let pendingTimeouts = [];
-
-  function playTone(freq, startDelay, duration, vol, type){
-    const id = setTimeout(()=>{
-      if(!playing || !audioCtx) return;
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.value = freq;
-      const now = audioCtx.currentTime;
-      gain.gain.setValueAtTime(0, now);
-      gain.gain.linearRampToValueAtTime(vol, now + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-      osc.connect(gain).connect(masterGain);
-      osc.start(now);
-      osc.stop(now + duration + 0.05);
-      activeNodes.push(osc);
-      osc.onended = ()=>{ activeNodes = activeNodes.filter(n=>n!==osc); };
-    }, startDelay*1000);
-    pendingTimeouts.push(id);
-  }
-
-  function scheduleLoop(){
-    let t = 0;
-    melody.forEach(([note,beats])=>{
-      const dur = beats*beatSec;
-      playTone(NOTE_FREQ[note], t, dur*0.92, 0.17, 'triangle');
-      t += dur;
-    });
-    chordPad.forEach(({chord,start,dur})=>{
-      chord.forEach(n=> playTone(NOTE_FREQ[n], start, dur, 0.045, 'sine'));
-    });
-    const loopId = setTimeout(()=>{ if(playing) scheduleLoop(); }, (t+1.4)*1000);
-    pendingTimeouts.push(loopId);
-  }
-
+  // ---- Background song (local file, plays only when opened from this computer) ----
   const musicBtn = document.getElementById('musicBtn');
+  const bgAudio = new Audio('lagu.mp3');
+  bgAudio.loop = true;
+  bgAudio.volume = 0.8;
+  let playing = false;
 
   function startMusic(){
-    if(!audioCtx){
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.9;
-      masterGain.connect(audioCtx.destination);
-    }
-    if(audioCtx.state === 'suspended') audioCtx.resume();
+    bgAudio.play().catch(()=>{});
     playing = true;
-    scheduleLoop();
     musicBtn.classList.add('playing');
     musicBtn.textContent = '🔈';
     musicBtn.title = 'Matikan musik';
   }
 
   function stopMusic(){
+    bgAudio.pause();
     playing = false;
-    pendingTimeouts.forEach(id => clearTimeout(id));
-    pendingTimeouts = [];
-    if(audioCtx){
-      const now = audioCtx.currentTime;
-      activeNodes.forEach(osc=>{ try{ osc.stop(now + 0.05); }catch(e){} });
-    }
-    activeNodes = [];
     musicBtn.classList.remove('playing');
     musicBtn.textContent = '🎵';
     musicBtn.title = 'Putar musik';

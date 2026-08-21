@@ -521,7 +521,7 @@
   <div class="age-badge">11</div>
   <h1 class="title">Happy Birthday</h1>
   <div class="subtitle">Aisyah 💕</div>
-  <div class="music-hint">🎵 nyalakan musik lembut di pojok kanan atas</div>
+  <div class="music-hint">🎵 tombol di pojok kanan atas buat nyala/matiin musik</div>
 
   <div class="frame" id="frame"></div>
   <div class="dots" id="dots"></div>
@@ -709,6 +709,7 @@
     if(entered === CORRECT_PIN){
       document.body.classList.add('unlocked');
       pinGate.classList.add('hidden');
+      startMusic();
     } else {
       pinError.textContent = 'PIN salah, coba lagi ya 🙈';
       pinGate.classList.add('shake');

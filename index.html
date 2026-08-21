@@ -674,13 +674,13 @@
   // ---- Background song (local file, plays only when opened from this computer) ----
   const musicBtn = document.getElementById('musicBtn');
   const musicHint = document.querySelector('.music-hint');
-  const bgAudio = new Audio('lagu.mp3');
+  const bgAudio = new Audio('birthday-song.mp3');
   bgAudio.loop = true;
   bgAudio.volume = 0.8;
   let playing = false;
 
   bgAudio.addEventListener('error', ()=>{
-    if(musicHint) musicHint.textContent = '⚠️ file lagu.mp3 tidak ditemukan / gagal dimuat';
+    if(musicHint) musicHint.textContent = '⚠️ file lagu tidak ditemukan / gagal dimuat';
   });
 
   function startMusic(){

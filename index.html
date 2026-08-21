@@ -446,6 +446,43 @@
     font-weight:700;
     font-size:0.85rem;
     min-height:1.3em;
+    margin-bottom:8px;
+  }
+
+  .pin-box{ caret-color:transparent; cursor:default; }
+
+  .pin-keypad{
+    display:grid;
+    grid-template-columns:repeat(3, 64px);
+    gap:12px;
+    margin-top:10px;
+  }
+  .pin-key{
+    width:64px;height:64px;
+    border-radius:50%;
+    border:none;
+    background:#fffdfb;
+    color:#5a3350;
+    font-size:1.4rem;
+    font-weight:800;
+    box-shadow:0 6px 14px rgba(150,80,130,0.18);
+    cursor:pointer;
+    transition:transform .12s, background .12s;
+  }
+  .pin-key:active{
+    transform:scale(0.9);
+    background:#ffe1ef;
+  }
+  .pin-key-empty{
+    background:transparent;
+    box-shadow:none;
+    cursor:default;
+    pointer-events:none;
+  }
+  .pin-key-del{
+    background:linear-gradient(135deg,var(--pink),var(--purple));
+    color:#fff;
+    font-size:1.2rem;
   }
 </style>
 </head>
@@ -456,12 +493,26 @@
   <h2 class="pin-title">Kartu Ulang Tahun Aisyah</h2>
   <p class="pin-sub">Masukkan PIN untuk membuka 🎂</p>
   <div class="pin-inputs" id="pinInputs">
-    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
-    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
-    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
-    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off">
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off" readonly>
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off" readonly>
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off" readonly>
+    <input type="tel" inputmode="numeric" maxlength="1" class="pin-box" autocomplete="off" readonly>
   </div>
   <div class="pin-error" id="pinError"></div>
+  <div class="pin-keypad" id="pinKeypad">
+    <button type="button" class="pin-key" data-digit="1">1</button>
+    <button type="button" class="pin-key" data-digit="2">2</button>
+    <button type="button" class="pin-key" data-digit="3">3</button>
+    <button type="button" class="pin-key" data-digit="4">4</button>
+    <button type="button" class="pin-key" data-digit="5">5</button>
+    <button type="button" class="pin-key" data-digit="6">6</button>
+    <button type="button" class="pin-key" data-digit="7">7</button>
+    <button type="button" class="pin-key" data-digit="8">8</button>
+    <button type="button" class="pin-key" data-digit="9">9</button>
+    <button type="button" class="pin-key pin-key-empty" tabindex="-1"></button>
+    <button type="button" class="pin-key" data-digit="0">0</button>
+    <button type="button" class="pin-key pin-key-del" id="pinDel">⌫</button>
+  </div>
 </div>
 
 <button class="music-btn" id="musicBtn" title="Putar musik">🎵</button>
@@ -667,24 +718,33 @@
     }
   }
 
-  pinBoxes.forEach((box,i)=>{
-    box.addEventListener('input', ()=>{
-      box.value = box.value.replace(/[^0-9]/g,'').slice(0,1);
-      if(box.value && i < pinBoxes.length - 1){
-        pinBoxes[i+1].focus();
-      }
-      if(pinBoxes.every(b => b.value.length === 1)){
-        checkPin();
-      }
-    });
-    box.addEventListener('keydown', (e)=>{
-      if(e.key === 'Backspace' && !box.value && i > 0){
-        pinBoxes[i-1].focus();
-      }
-    });
-  });
+  function addDigit(d){
+    const box = pinBoxes.find(b => !b.value);
+    if(!box) return;
+    pinError.textContent = '';
+    box.value = d;
+    if(pinBoxes.every(b => b.value.length === 1)){
+      checkPin();
+    }
+  }
 
-  if(pinBoxes[0]) pinBoxes[0].focus();
+  function deleteDigit(){
+    for(let i = pinBoxes.length - 1; i >= 0; i--){
+      if(pinBoxes[i].value){ pinBoxes[i].value = ''; break; }
+    }
+  }
+
+  document.querySelectorAll('.pin-key[data-digit]').forEach(btn=>{
+    btn.addEventListener('click', ()=> addDigit(btn.dataset.digit));
+  });
+  document.getElementById('pinDel').addEventListener('click', deleteDigit);
+
+  // Physical keyboard still works as a shortcut
+  document.addEventListener('keydown', (e)=>{
+    if(pinGate.classList.contains('hidden')) return;
+    if(/^[0-9]$/.test(e.key)) addDigit(e.key);
+    else if(e.key === 'Backspace') deleteDigit();
+  });
 </script>
 </body>
 </html>

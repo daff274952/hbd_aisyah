@@ -673,17 +673,29 @@
 
   // ---- Background song (local file, plays only when opened from this computer) ----
   const musicBtn = document.getElementById('musicBtn');
+  const musicHint = document.querySelector('.music-hint');
   const bgAudio = new Audio('lagu.mp3');
   bgAudio.loop = true;
   bgAudio.volume = 0.8;
   let playing = false;
 
+  bgAudio.addEventListener('error', ()=>{
+    if(musicHint) musicHint.textContent = '⚠️ file lagu.mp3 tidak ditemukan / gagal dimuat';
+  });
+
   function startMusic(){
-    bgAudio.play().catch(()=>{});
-    playing = true;
-    musicBtn.classList.add('playing');
-    musicBtn.textContent = '🔈';
-    musicBtn.title = 'Matikan musik';
+    bgAudio.play().then(()=>{
+      playing = true;
+      musicBtn.classList.add('playing');
+      musicBtn.textContent = '🔈';
+      musicBtn.title = 'Matikan musik';
+    }).catch(()=>{
+      playing = false;
+      musicBtn.classList.remove('playing');
+      musicBtn.textContent = '🎵';
+      musicBtn.title = 'Putar musik';
+      if(musicHint) musicHint.textContent = '🔇 browser memblokir autoplay — klik tombol musik di pojok kanan atas ya';
+    });
   }
 
   function stopMusic(){

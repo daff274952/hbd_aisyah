@@ -484,9 +484,189 @@
     color:#fff;
     font-size:1.2rem;
   }
+
+  /* Flower + butterfly burst intro, shown before the PIN screen */
+  .flower-intro{
+    position:fixed;
+    inset:0;
+    z-index:300;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:linear-gradient(160deg,#ffe1ef 0%, #ffd6e8 25%, #e6d9ff 55%, #d9f2ff 100%);
+    transition:opacity 1s ease;
+  }
+  .flower-intro.fade-out{ opacity:0; }
+  .flower-intro.done{ display:none; }
+
+  .flower-zoom{
+    position:relative;
+    width:100%;height:100%;
+    display:flex;align-items:center;justify-content:center;
+    animation:introZoom 4s ease-in-out forwards;
+  }
+  @keyframes introZoom{
+    0%{transform:scale(1);}
+    100%{transform:scale(1.8);}
+  }
+
+  .burst-item{
+    position:absolute;
+    top:50%;left:50%;
+    animation:flowerBurst 3.5s cubic-bezier(0.2,0.8,0.4,1) forwards;
+    opacity:0;
+  }
+  @keyframes flowerBurst{
+    0%{transform:translate(-50%,-50%) translate(0,0) scale(0) rotate(0deg);opacity:0;}
+    10%{transform:translate(-50%,-50%) translate(calc(var(--tx) * 0.1), calc(var(--ty) * 0.1)) scale(calc(var(--scale) * 0.7)) rotate(calc(var(--rot) * 0.2));opacity:1;}
+    50%{transform:translate(-50%,-50%) translate(calc(var(--tx) * 0.3), calc(var(--ty) * 0.3)) scale(calc(var(--scale) * 1.2)) rotate(calc(var(--rot) * 0.6));opacity:1;}
+    100%{transform:translate(-50%,-50%) translate(var(--tx), var(--ty)) scale(calc(var(--scale) * 2.3)) rotate(var(--rot));opacity:0;}
+  }
+  .burst-item-img{
+    display:block;
+    width:100%;height:100%;
+    object-fit:contain;
+    filter:drop-shadow(0 3px 6px rgba(120,60,40,0.18));
+  }
+  .burst-item-flap{
+    width:100%;height:100%;
+    animation:flap 0.5s ease-in-out infinite;
+  }
+  @keyframes flap{
+    0%,100%{transform:scaleX(1);}
+    50%{transform:scaleX(0.72);}
+  }
+
+  /* Cinematic birthday intro, shown right after the correct PIN is entered */
+  .birthday-intro{
+    position:fixed;
+    inset:0;
+    z-index:250;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+    background:linear-gradient(160deg,#ffe1ef 0%, #ffd6e8 25%, #e6d9ff 55%, #d9f2ff 100%);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 1s ease;
+  }
+  .birthday-intro.show{ opacity:1; pointer-events:auto; }
+  .birthday-intro.fade-out{ opacity:0; }
+  .birthday-intro.done{ display:none; }
+
+  .bi-zoom{
+    position:absolute;
+    inset:0;
+    animation:biZoomOut 4s cubic-bezier(0.2,0.8,0.2,1) forwards;
+  }
+  @keyframes biZoomOut{
+    0%{transform:scale(2.1);}
+    100%{transform:scale(1);}
+  }
+
+  .bi-corner{
+    position:absolute;
+    width:50%;
+    max-width:300px;
+    opacity:0;
+    animation-fill-mode:forwards;
+  }
+  .bi-corner img{ width:100%; height:auto; display:block; }
+  .bi-corner.tl{
+    top:-8%; left:-10%;
+    transform-origin:top left;
+    animation-name:biFadeIn, biSwayTL;
+    animation-duration:1s, 6s;
+    animation-iteration-count:1, infinite;
+    animation-timing-function:ease-out, ease-in-out;
+  }
+  .bi-corner.br{
+    bottom:-8%; right:-10%;
+    transform-origin:bottom right;
+    animation-name:biFadeIn, biSwayBR;
+    animation-duration:1s, 7s;
+    animation-iteration-count:1, infinite;
+    animation-timing-function:ease-out, ease-in-out;
+  }
+  .bi-corner.tr{
+    top:-4%; right:-4%;
+    width:30%; max-width:170px;
+    animation-name:biFadeIn, biFlutter1;
+    animation-duration:1s, 4s;
+    animation-iteration-count:1, infinite;
+    animation-timing-function:ease-out, ease-in-out;
+  }
+  .bi-corner.bl{
+    bottom:-4%; left:-4%;
+    width:30%; max-width:170px;
+    animation-name:biFadeIn, biFlutter2;
+    animation-duration:1s, 4.5s;
+    animation-iteration-count:1, infinite;
+    animation-timing-function:ease-out, ease-in-out;
+  }
+  .bi-corner.bl .bi-flip{ transform:scaleX(-1); }
+
+  @keyframes biFadeIn{ 0%{opacity:0;} 100%{opacity:1;} }
+  @keyframes biSwayTL{ 0%,100%{transform:rotate(-2deg) scale(1);} 50%{transform:rotate(2deg) scale(1.02);} }
+  @keyframes biSwayBR{ 0%,100%{transform:rotate(2deg) scale(1);} 50%{transform:rotate(-2deg) scale(1.02);} }
+  @keyframes biFlutter1{
+    0%,100%{transform:translate(0,0);}
+    25%{transform:translate(6px,-10px);}
+    50%{transform:translate(10px,0);}
+    75%{transform:translate(6px,10px);}
+  }
+  @keyframes biFlutter2{
+    0%,100%{transform:translate(0,0);}
+    25%{transform:translate(-6px,-10px);}
+    50%{transform:translate(-10px,0);}
+    75%{transform:translate(-6px,10px);}
+  }
+
+  .bi-text{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:0 24px;
+  }
+  .bi-line{
+    opacity:0;
+    transform:scale(0.85) translateY(15px);
+    animation:biTextPop 1s cubic-bezier(0.2,0.8,0.2,1) forwards;
+    text-shadow:0 2px 10px rgba(255,255,255,0.9), 0 1px 3px rgba(255,255,255,0.9);
+  }
+  @keyframes biTextPop{
+    0%{opacity:0;transform:scale(0.85) translateY(15px);}
+    40%{opacity:1;transform:scale(1.02) translateY(-2px);}
+    100%{opacity:1;transform:scale(1) translateY(0);}
+  }
+  .bi-line.small{
+    font-size:1.5rem;
+    font-weight:800;
+    letter-spacing:3px;
+    color:var(--purple);
+  }
+  .bi-line.big{
+    font-size:3.2rem;
+    font-weight:900;
+    color:var(--pink-deep);
+    margin:4px 0;
+  }
+  .bi-line.name{
+    font-size:1.7rem;
+    font-weight:700;
+    font-style:italic;
+    color:var(--purple);
+    margin-top:6px;
+  }
 </style>
 </head>
 <body>
+
+<div class="flower-intro" id="flowerIntro">
+  <div class="flower-zoom" id="flowerZoom"></div>
+</div>
 
 <div class="pin-gate" id="pinGate">
   <div class="pin-lock-icon">🔒</div>
@@ -512,6 +692,21 @@
     <button type="button" class="pin-key pin-key-empty" tabindex="-1"></button>
     <button type="button" class="pin-key" data-digit="0">0</button>
     <button type="button" class="pin-key pin-key-del" id="pinDel">⌫</button>
+  </div>
+</div>
+
+<div class="birthday-intro" id="birthdayIntro">
+  <div class="bi-zoom">
+    <div class="bi-corner tl"><img src="bunga/2.png" alt=""></div>
+    <div class="bi-corner br"><img src="bunga/6.png" alt=""></div>
+    <div class="bi-corner tr"><img src="bunga/Butterfly Flies In Air Yellow (1).png" alt=""></div>
+    <div class="bi-corner bl"><div class="bi-flip"><img src="bunga/Butterfly Flies In Air Yellow (1).png" alt=""></div></div>
+  </div>
+  <div class="bi-text">
+    <div class="bi-line small" style="animation-delay:.3s">HAPPY</div>
+    <div class="bi-line big" style="animation-delay:1.1s">11TH</div>
+    <div class="bi-line small" style="animation-delay:1.9s">BIRTHDAY</div>
+    <div class="bi-line name" style="animation-delay:2.7s">Aisyah Sayang 💕</div>
   </div>
 </div>
 
@@ -674,7 +869,7 @@
   // ---- Background song (local file, plays only when opened from this computer) ----
   const musicBtn = document.getElementById('musicBtn');
   const musicHint = document.querySelector('.music-hint');
-  const bgAudio = new Audio('birthday-song.mp3');
+  const bgAudio = new Audio(encodeURI('Happy Birthday  Indian, Funny  (1).mp3'));
   bgAudio.loop = true;
   bgAudio.volume = 0.8;
   let playing = false;
@@ -710,18 +905,93 @@
     if(!playing) startMusic(); else stopMusic();
   });
 
+  // ---- Flower + butterfly burst intro (plays once before the PIN screen) ----
+  const flowerIntro = document.getElementById('flowerIntro');
+  const flowerZoom = document.getElementById('flowerZoom');
+  const bungaImgs = [1,2,3,4,5,6,7,8].map(n => `bunga/${n}.png`);
+  const butterflySrc = "bunga/Butterfly Flies In Air Yellow (1).png";
+
+  function makeBurstItem({ src, size, delay, flap }) {
+    const angle = Math.random() * Math.PI * 2;
+    const travelDistance = 120 + Math.random() * 780;
+    const scale = 0.5 + Math.random() * 1.1;
+    const rotation = (Math.random() - 0.5) * 360;
+
+    const item = document.createElement('div');
+    item.className = 'burst-item';
+    item.style.width = size + 'px';
+    item.style.height = size + 'px';
+    item.style.setProperty('--tx', Math.cos(angle) * travelDistance + 'px');
+    item.style.setProperty('--ty', Math.sin(angle) * travelDistance + 'px');
+    item.style.setProperty('--scale', scale);
+    item.style.setProperty('--rot', rotation + 'deg');
+    item.style.animationDelay = delay + 's';
+    item.style.zIndex = Math.floor(Math.random() * 200);
+
+    const img = document.createElement('img');
+    img.className = 'burst-item-img';
+    img.src = src;
+    img.alt = '';
+
+    if (flap) {
+      const flapWrap = document.createElement('div');
+      flapWrap.className = 'burst-item-flap';
+      flapWrap.style.animationDelay = (Math.random() * 0.4) + 's';
+      flapWrap.appendChild(img);
+      item.appendChild(flapWrap);
+    } else {
+      item.appendChild(img);
+    }
+    return item;
+  }
+
+  const totalFlowers = 90;
+  for (let i = 0; i < totalFlowers; i++) {
+    const src = bungaImgs[Math.floor(Math.random() * bungaImgs.length)];
+    flowerZoom.appendChild(makeBurstItem({
+      src,
+      size: 60 + Math.random() * 50,
+      delay: Math.random() * 0.5,
+      flap: false
+    }));
+  }
+
+  const totalButterflies = 12;
+  for (let i = 0; i < totalButterflies; i++) {
+    flowerZoom.appendChild(makeBurstItem({
+      src: butterflySrc,
+      size: 46 + Math.random() * 30,
+      delay: Math.random() * 0.6,
+      flap: true
+    }));
+  }
+
+  setTimeout(() => flowerIntro.classList.add('fade-out'), 2800);
+  setTimeout(() => flowerIntro.classList.add('done'), 3800);
+
   // ---- PIN gate ----
   const CORRECT_PIN = '2008';
   const pinGate = document.getElementById('pinGate');
   const pinError = document.getElementById('pinError');
   const pinBoxes = Array.from(document.querySelectorAll('.pin-box'));
 
+  const birthdayIntro = document.getElementById('birthdayIntro');
+
+  function showBirthdayIntro(){
+    birthdayIntro.classList.add('show');
+    setTimeout(()=> birthdayIntro.classList.add('fade-out'), 6000);
+    setTimeout(()=>{
+      birthdayIntro.classList.add('done');
+      document.body.classList.add('unlocked');
+    }, 7000);
+  }
+
   function checkPin(){
     const entered = pinBoxes.map(b => b.value).join('');
     if(entered === CORRECT_PIN){
-      document.body.classList.add('unlocked');
       pinGate.classList.add('hidden');
       startMusic();
+      showBirthdayIntro();
     } else {
       pinError.textContent = 'PIN salah, coba lagi ya 🙈';
       pinGate.classList.add('shake');
